@@ -1,0 +1,40 @@
+name: Fly Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    concurrency:
+      group: main-deploy
+      cancel-in-progress: false
+    name: Deploy app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: superfly/flyctl-actions/setup-flyctl@1.5
+      - name: Deploy App
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_SEARCH_DEPLOY_TOKEN }}
+
+  set_tokens:
+    name: Setup tokens
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install --ignore-scripts
+      - name: Run script
+        run: pnpm run start
+        env:
+          TYPESENSE_ADMIN_API_KEY: ${{ secrets.TYPESENSE_ADMIN_API_KEY }}
+          TYPESENSE_WRITE_API_KEY: ${{ secrets.TYPESENSE_WRITE_API_KEY }}
+          TYPESENSE_PUBLIC_API_KEY: ${{ secrets.TYPESENSE_PUBLIC_API_KEY }}

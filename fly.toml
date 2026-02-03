@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for playful-web on 2025-09-27T10:47:33-04:00
+# fly.toml app configuration file generated for playful-search on 2026-02-02T20:42:57-05:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -6,8 +6,17 @@
 app = 'playful-search'
 primary_region = 'sjc'
 
+[build]
+
 [deploy]
   strategy = 'rolling'
+
+[[mounts]]
+  source = 'search_data'
+  destination = '/data'
+  auto_extend_size_threshold = 90
+  auto_extend_size_increment = '1GB'
+  auto_extend_size_limit = '5GB'
 
 [http_service]
   internal_port = 8108
@@ -25,10 +34,3 @@ primary_region = 'sjc'
 
 [[vm]]
   size = 'shared-cpu-1x'
-
-[mounts]
-  source = "search_data"
-  destination = "/data"
-  auto_extend_size_threshold = 90
-  auto_extend_size_increment = "1GB"
-  auto_extend_size_limit = "5GB"
