@@ -22,7 +22,7 @@ console.log("Creating search index deployment key");
 
 await client.keys().create({
 	description: "Search index deployment key",
-	actions: ["documents:upsert"],
+	actions: ["collections:*", "documents:*"],
 	collections: ["*"],
 	value: process.env.TYPESENSE_WRITE_API_KEY!,
 }).catch(handleExistsError);
