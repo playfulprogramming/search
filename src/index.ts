@@ -8,6 +8,16 @@ const client = new Typesense.Client({
 	connectionTimeoutSeconds: 2,
 });
 
+function handleExistsError(e: unknown) {
+	if (e && typeof e === "object" && "httpStatus" in e) {
+		if (e.httpStatus === 409) {
+			console.log("Key already exists.");
+			return;
+		}
+	}
+	throw e;
+}
+
 console.log("Creating search index deployment key");
 
 await client.keys().create({
@@ -15,7 +25,7 @@ await client.keys().create({
 	actions: ["documents:upsert"],
 	collections: ["*"],
 	value: process.env.TYPESENSE_WRITE_API_KEY!,
-});
+}).catch(handleExistsError);
 
 console.log("Creating public frontend key");
 
@@ -24,5 +34,5 @@ await client.keys().create({
 	actions: ["documents:search"],
 	collections: ["*"],
 	value: process.env.TYPESENSE_PUBLIC_API_KEY!,
-});
+}).catch(handleExistsError);
 
