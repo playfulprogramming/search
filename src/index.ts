@@ -8,12 +8,16 @@ const client = new Typesense.Client({
 	connectionTimeoutSeconds: 2,
 });
 
+console.log("Creating search index deployment key");
+
 await client.keys().create({
 	description: "Search index deployment key",
 	actions: ["documents:upsert"],
 	collections: ["*"],
 	value: process.env.TYPESENSE_WRITE_API_KEY!,
 });
+
+console.log("Creating public frontend key");
 
 await client.keys().create({
 	description: "Frontend search key",
